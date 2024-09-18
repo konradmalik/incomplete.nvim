@@ -10,9 +10,17 @@ This small plugin for Neovim allows using `vim.opt.completefunc` to serve, expan
 require("incomplete").setup()
 ```
 
-After that, try opening your completefunc (`CTRL-X CTRL-U`)
+After that, try opening your completefunc (`CTRL-X CTRL-U`) and using it as usual (type to filter, `CTRL-n`,`CTRL-p` to
+scroll, `CTRL-y` to select). See `help completefunc`.
 
-For now, no configuration is possible.
+Some completeopts may be useful. E.g.:
+
+```lua
+vim.opt.shortmess:append("c")
+vim.opt.completeopt = { "menuone", "popup", "noinsert", "noselect", "fuzzy" }
+```
+
+For now, no plugin configuration is possible.
 
 ## Adding snippets
 
