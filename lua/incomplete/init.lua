@@ -17,7 +17,7 @@ local additional_loads = {
 
 ---@param what string
 ---@return CompleteItem[]
-local function build_cache_for(what) return require("pde.incomplete.json").load_for(what) end
+local function build_cache_for(what) return require("incomplete.json").load_for(what) end
 
 ---@param completed_item {word: string}
 local function handle_accepted_snippet(completed_item)
