@@ -1,0 +1,5 @@
+!flake.lock
+.direnv
+result
+*.spl
+*.log
