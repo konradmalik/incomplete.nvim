@@ -40,3 +40,11 @@ a given filetype automatically when opening such buffer.
 ## Reference
 
 For reference usage, snippets etc. see [my neovim config](https://github.com/konradmalik/neovim-flake).
+
+## FAQ
+
+-   for some filetypes, no friendly-snippets are loaded
+    -   names of files and folders in friendly-snippets can be different, than filetype value in neovim. See
+        https://github.com/konradmalik/incomplete.nvim/blob/main/lua/incomplete/init.lua#L12. If you find more of them, I
+        would be grateful for creating a PR with new entries.
+
