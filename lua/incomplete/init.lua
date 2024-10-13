@@ -76,7 +76,7 @@ do
     ---completefunc implementation that serves snippets
     ---@param findstart integer
     ---@param base string
-    ---@return integer|CompleteItem
+    ---@return integer|{words: CompleteItem[]}
     function M.completefunc(findstart, base)
         if findstart == 1 and base == "" then
             -- column where completion starts

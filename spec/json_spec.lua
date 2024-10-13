@@ -31,6 +31,7 @@ describe("json module", function()
         local actual_snippets = json.load_for("all")
 
         -- assert
+        table.sort(actual_snippets, function(a, b) return a.word < b.word end)
         assert.are.same({
             {
                 ["info"] = "when you have enough",
