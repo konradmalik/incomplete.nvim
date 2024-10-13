@@ -1,0 +1,61 @@
+local json = require("incomplete.json")
+local original_rtp = vim.o.rtp
+
+describe("json module", function()
+    setup(function() vim.o.rtp = "./test," .. vim.o.rtp end)
+    teardown(function() vim.o.rtp = original_rtp end)
+
+    it("reads snippets for a type in a folder", function()
+        -- act
+        local actual_snippets = json.load_for("go")
+
+        -- assert
+        assert.are.same({
+            {
+                ["info"] = "ChatGPT's suggested single line gopher ascii art...",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["body"] = "(|-.-|)",
+                        ["prefix"] = { "go", "gopher" },
+                        ["description"] = "ChatGPT's suggested single line gopher ascii art...",
+                    },
+                },
+                ["word"] = "gopher",
+            },
+        }, actual_snippets)
+    end)
+
+    it("reads snippets for a type in a file", function()
+        -- act
+        local actual_snippets = json.load_for("all")
+
+        -- assert
+        assert.are.same({
+            {
+                ["info"] = "when you have enough",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["body"] = "(╯°□°)╯彡┻━┻",
+                        ["prefix"] = "rageflip",
+                        ["description"] = "when you have enough",
+                    },
+                },
+                ["word"] = "rageflip",
+            },
+            {
+                ["info"] = "when you have nothing better to say",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["body"] = "¯\\_(ツ)_/¯",
+                        ["prefix"] = "shrug",
+                        ["description"] = "when you have nothing better to say",
+                    },
+                },
+                ["word"] = "shrug",
+            },
+        }, actual_snippets)
+    end)
+end)
