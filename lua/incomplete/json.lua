@@ -36,7 +36,6 @@ end
 ---@param snips table<string, table>[]
 ---@return CompleteItem[]
 local function convert(snips)
-    P(snips)
     return vim.tbl_values(vim.tbl_map(function(value)
         ---@type CompleteItem
         return {
