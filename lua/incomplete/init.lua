@@ -43,18 +43,23 @@ local function is_relevant_event(completed_item)
     return vim.tbl_get(completed_item, "user_data", "incomplete") ~= nil
 end
 
+---@param completed_item CompleteItem
+---@param event_reason string
+local function handle_autocmd(completed_item, event_reason)
+    if not is_relevant_event(completed_item) then return end
+
+    if event_reason == "accept" then handle_accepted_snippet(completed_item) end
+end
+
 local M = {}
+
+M._handle_autocmd = handle_autocmd
 
 function M.setup()
     local group = vim.api.nvim_create_augroup("incomplete", { clear = true })
     vim.api.nvim_create_autocmd("CompleteDone", {
         group = group,
-        callback = function()
-            local completed_item = vim.v.completed_item
-            if not is_relevant_event(completed_item) then return end
-
-            if vim.v.event["reason"] == "accept" then handle_accepted_snippet(completed_item) end
-        end,
+        callback = function() handle_autocmd(vim.v.completed_item, vim.v.event["reason"]) end,
     })
 
     vim.o.completefunc = "v:lua.require'incomplete'.completefunc"
