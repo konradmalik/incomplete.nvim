@@ -43,6 +43,26 @@
           };
         in
         {
+          packages =
+            let
+              fs = pkgs.lib.fileset;
+              sourceFiles = fs.unions [
+                ./lua
+              ];
+              incomplete-nvim = pkgs.vimUtils.buildVimPlugin {
+                src = fs.toSource {
+                  root = ./.;
+                  fileset = sourceFiles;
+                };
+                pname = "incomplete-nvim";
+                version = "latest";
+                nvimRequireCheck = "incomplete";
+              };
+            in
+            {
+              inherit incomplete-nvim;
+              default = incomplete-nvim;
+            };
           devShells.default = pkgs.mkShell {
             shellHook =
               let
