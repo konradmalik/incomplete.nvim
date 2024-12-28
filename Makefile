@@ -15,4 +15,4 @@ check-lint: luacheck
 
 .PHONY: test
 test:
-	@busted
+	@busted --lua=nlua
