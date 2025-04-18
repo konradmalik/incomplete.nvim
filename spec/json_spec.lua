@@ -5,28 +5,7 @@ describe("json module", function()
     setup(function() vim.o.rtp = "./test," .. vim.o.rtp end)
     teardown(function() vim.o.rtp = original_rtp end)
 
-    it("reads snippets for a type in a folder", function()
-        -- act
-        local actual_snippets = json.load_for("go")
-
-        -- assert
-        assert.are.same({
-            {
-                ["info"] = "ChatGPT's suggested single line gopher ascii art...",
-                ["menu"] = "󰩫",
-                ["user_data"] = {
-                    ["incomplete"] = {
-                        ["body"] = "(|-.-|)",
-                        ["prefix"] = { "go", "gopher" },
-                        ["description"] = "ChatGPT's suggested single line gopher ascii art...",
-                    },
-                },
-                ["word"] = "gopher",
-            },
-        }, actual_snippets)
-    end)
-
-    it("reads snippets for a type in a file", function()
+    it("reads snippets for 'all'", function()
         -- act
         local actual_snippets = json.load_for("all")
 
@@ -56,6 +35,40 @@ describe("json module", function()
                     },
                 },
                 ["word"] = "shrug",
+            },
+        }, actual_snippets)
+    end)
+
+    it("reads snippets for an ft when two are specified", function()
+        -- act
+        local actual_snippets = json.load_for("go")
+
+        -- assert
+        table.sort(actual_snippets, function(a, b) return a.word < b.word end)
+        assert.are.same({
+            {
+                ["info"] = "ChatGPT's suggested single line gopher ascii art...",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["body"] = "(|-.-|)",
+                        ["prefix"] = { "go", "gopher" },
+                        ["description"] = "ChatGPT's suggested single line gopher ascii art...",
+                    },
+                },
+                ["word"] = "gopher",
+            },
+            {
+                ["info"] = "ChatGPT's suggested single line gopher ascii art... but doubled",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["body"] = "(|-.-|)(|-.-|)",
+                        ["prefix"] = { "go", "gopher" },
+                        ["description"] = "ChatGPT's suggested single line gopher ascii art... but doubled",
+                    },
+                },
+                ["word"] = "gopher",
             },
         }, actual_snippets)
     end)

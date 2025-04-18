@@ -39,7 +39,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(3, #actual_snippets.words)
+        assert.are.same(4, #actual_snippets.words)
     end)
 
     it("compfunc has caching", function()
@@ -50,7 +50,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(3, #actual_snippets.words)
+        assert.are.same(4, #actual_snippets.words)
     end)
 
     it("_handle_autocmd works for 'accepted'", function()
