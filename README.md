@@ -25,10 +25,11 @@ For now, no plugin configuration is possible.
 ## Adding snippets
 
 Only vscode-like json snippets are supported, they must be placed in a `snippets/` folder at the root of your
-runtimepath (e.g. at `$XDG_CONFIG_HOME/nvim/snippets`).
+runtimepath (e.g. at `$XDG_CONFIG_HOME/nvim/snippets`) with a `package.json` that contains metadata about all snippets.
 
-Snippets in a file or folder named `all.json` will be always loaded. Snippets in files or folders named after vim
-filetype will be loaded only for that filetype.
+Snippets for ft named `all` will be always loaded. Snippets for other fts will be loaded lazily only for that filetype.
+
+See [Chris Grieser's nvim-scissors](https://github.com/chrisgrieser/nvim-scissors?tab=readme-ov-file#cookbook--faq) for a quick guide.
 
 ## Friendly Snippets
 
@@ -40,11 +41,3 @@ a given filetype automatically when opening such buffer.
 ## Reference
 
 For reference usage, snippets etc. see [my neovim config](https://github.com/konradmalik/neovim-flake).
-
-## FAQ
-
--   for some filetypes, no friendly-snippets are loaded
-    -   names of files and folders in friendly-snippets can be different, than filetype value in neovim. See
-        https://github.com/konradmalik/incomplete.nvim/blob/main/lua/incomplete/init.lua#L12. If you find more of them, I
-        would be grateful for creating a PR with new entries.
-
