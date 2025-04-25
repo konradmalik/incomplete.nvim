@@ -44,7 +44,7 @@ describe("json module", function()
         local actual_snippets = json.load_for("go")
 
         -- assert
-        table.sort(actual_snippets, function(a, b) return a.word < b.word end)
+        table.sort(actual_snippets, function(a, b) return a.info < b.info end)
         assert.are.same({
             {
                 ["info"] = "ChatGPT's suggested single line gopher ascii art...",
