@@ -9,12 +9,6 @@
 ---@field words string|CompleteItem
 ---@field refresh? "always"|nil
 
---- needed for friendly-snippets
---- if something's not here, the original ft will be used
-local additional_loads = {
-    cs = { "csharp" },
-}
-
 ---@param what string
 ---@return CompleteItem[]
 local function build_cache_for(what) return require("incomplete.json").load_for(what) end
@@ -91,16 +85,10 @@ do
         end
 
         local bufnr = vim.api.nvim_get_current_buf()
-        local orig_ft = vim.bo[bufnr].filetype
-        local all_ft = additional_loads[orig_ft] or {}
-        table.insert(all_ft, orig_ft)
+        local ft = vim.bo[bufnr].filetype
 
         local gathered_snippets = {}
-
-        for _, ft in ipairs(all_ft) do
-            if ft ~= "" then inject_snippets_for(ft, gathered_snippets) end
-        end
-
+        inject_snippets_for(ft, gathered_snippets)
         inject_snippets_for("all", gathered_snippets)
 
         return {
