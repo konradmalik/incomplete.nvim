@@ -6,9 +6,13 @@ This small plugin for Neovim allows using `vim.opt.completefunc` to serve, expan
 
 ## Usage
 
+Just set your complete function to the one exposed in this plugin:
+
 ```lua
-require("incomplete").setup()
+vim.o.completefunc = "v:lua.require'incomplete'.completefunc"
 ```
+
+It can also be buffer-local.
 
 After that, try opening your completefunc (`CTRL-X CTRL-U`) and using it as usual (type to filter, `CTRL-n`,`CTRL-p` to
 scroll, `CTRL-y` to select). See `help completefunc`.
