@@ -7,7 +7,7 @@ function M.get_buf_lines(bufnr) return vim.api.nvim_buf_get_lines(bufnr, 0, -1, 
 ---@param winid integer
 ---@param bufnr integer
 ---@param body string|string[]
----@return CompleteItem
+---@return vim.v.completed_item
 function M.simulate_complete_done(winid, bufnr, body)
     local completed_item = { word = "word", user_data = { incomplete = { body = body } } }
     -- fake as if we used completion menu (word would be inserted)

@@ -1,16 +1,9 @@
----@class CompleteItem
----@field word string actual completion value
----@field menu string menu entry label
----@field abbr? string menu entry
----@field info? string additional info displayed next to menu entry
----@field user_data {source: {incomplete: true}}
-
 ---@class CompleteDict
----@field words string|CompleteItem
+---@field words string|vim.v.completed_item
 ---@field refresh? "always"|nil
 
 ---@param what string
----@return CompleteItem[]
+---@return vim.v.completed_item[]
 local function build_cache_for(what) return require("incomplete.json").load_for(what) end
 
 ---@param completed_item {word: string}
@@ -33,11 +26,12 @@ local function handle_accepted_snippet(completed_item)
 end
 
 ---@param completed_item {user_data: table?}
+---@return boolean
 local function is_relevant_event(completed_item)
     return vim.tbl_get(completed_item, "user_data", "incomplete") ~= nil
 end
 
----@param completed_item CompleteItem
+---@param completed_item vim.v.completed_item
 ---@param event_reason string
 local function handle_autocmd(completed_item, event_reason)
     if not is_relevant_event(completed_item) then return end
@@ -60,7 +54,7 @@ function M.setup()
 end
 
 do
-    ---@type table<string,CompleteItem[]>
+    ---@type table<string,vim.v.completed_item[]>
     local cached_snippets = {}
 
     ---uses or populates cache and injects data into target
@@ -75,7 +69,7 @@ do
     ---completefunc implementation that serves snippets
     ---@param findstart integer
     ---@param base string
-    ---@return integer|{words: CompleteItem[]}
+    ---@return integer|{words: vim.v.completed_item[]}
     function M.completefunc(findstart, base)
         if findstart == 1 and base == "" then
             -- column where completion starts
@@ -92,7 +86,7 @@ do
         inject_snippets_for("all", gathered_snippets)
 
         return {
-            ---@type CompleteItem[]
+            ---@type vim.v.completed_item[]
             words = gathered_snippets,
         }
     end

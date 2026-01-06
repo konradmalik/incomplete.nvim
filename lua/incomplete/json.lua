@@ -33,10 +33,10 @@ end
 
 ---converts json snippets into incomplete
 ---@param snips table<string, table>[]
----@return CompleteItem[]
+---@return vim.v.completed_item[]
 local function convert(snips)
     return vim.tbl_values(vim.tbl_map(function(value)
-        ---@type CompleteItem
+        ---@type vim.v.completed_item
         return {
             word = get_prefix(value.prefix),
             menu = "󰩫",
