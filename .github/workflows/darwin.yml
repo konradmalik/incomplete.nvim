@@ -4,10 +4,10 @@ on:
       - main
   pull_request:
 
-name: x86_64-darwin
+name: aarch64-darwin
 jobs:
   flake-check:
-    runs-on: macos-15-intel
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
@@ -18,7 +18,7 @@ jobs:
         run: nix flake check
 
   tests:
-    runs-on: macos-15-intel
+    runs-on: macos-26
     needs:
       - flake-check
     steps:
