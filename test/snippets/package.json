@@ -1,5 +1,5 @@
 {
-    "name": "test-snippets",
+    "name": "test-snippets-nested",
     "contributes": {
         "snippets": [
             {

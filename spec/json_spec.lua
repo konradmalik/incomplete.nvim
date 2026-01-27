@@ -36,6 +36,18 @@ describe("json module", function()
                 },
                 ["word"] = "shrug",
             },
+            {
+                ["info"] = "iksde",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["body"] = "xD",
+                        ["prefix"] = "xd",
+                        ["description"] = "iksde",
+                    },
+                },
+                ["word"] = "xd",
+            },
         }, actual_snippets)
     end)
 

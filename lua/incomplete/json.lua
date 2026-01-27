@@ -53,24 +53,22 @@ local function build_ft_snippet_lookup()
     ---@type table<string,string[]>
     local lookup = {}
 
-    for _, pkgfile in ipairs(vim.api.nvim_get_runtime_file("snippets/package.json", true)) do
-        local packagedir = vim.fs.dirname(pkgfile)
-        local pkg = deep_read({ pkgfile })
-        local snippets = vim.tbl_get(pkg, "contributes", "snippets") or {}
+    for _, pattern in ipairs({ "package.json", "snippets/package.json" }) do
+        for _, pkgfile in ipairs(vim.api.nvim_get_runtime_file(pattern, true)) do
+            local packagedir = vim.fs.dirname(pkgfile)
+            local pkg = deep_read({ pkgfile })
+            local snippets = vim.tbl_get(pkg, "contributes", "snippets") or {}
 
-        for _, snippet_entry in ipairs(snippets) do
-            local languages = {}
-            if type(snippet_entry["language"]) == "string" then
-                languages = { snippet_entry["language"] }
-            else
-                languages = snippet_entry["language"]
-            end
+            for _, snippet_entry in ipairs(snippets) do
+                local languages = snippet_entry["language"]
+                if type(languages) == "string" then languages = { languages } end
 
-            for _, lang in ipairs(languages) do
-                if not lookup[lang] then lookup[lang] = {} end
-                local relative_path = snippet_entry["path"]
-                local absolute_path = vim.fs.abspath(vim.fs.joinpath(packagedir, relative_path))
-                table.insert(lookup[lang], absolute_path)
+                for _, lang in ipairs(languages) do
+                    if not lookup[lang] then lookup[lang] = {} end
+                    local relative_path = snippet_entry["path"]
+                    local absolute_path = vim.fs.abspath(vim.fs.joinpath(packagedir, relative_path))
+                    table.insert(lookup[lang], absolute_path)
+                end
             end
         end
     end
