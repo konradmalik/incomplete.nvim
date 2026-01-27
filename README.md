@@ -35,6 +35,9 @@ Works with vim/nvim autocompletion. Example:
 vim.o.complete = "o,.,w,b,u,F"
 ```
 
+But snippets respond the quickest almost always, so they're always on the top of the list. I find this annoying and
+don't use `F` source in autocompletion. Instead, I request snippets manually via `Ctrl-x Ctrl-u`.
+
 ## Adding snippets
 
 Only vscode-like json snippets are supported, they must be placed in a `snippets/` folder at the root of your
