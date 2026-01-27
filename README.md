@@ -26,6 +26,15 @@ vim.opt.completeopt = { "menuone", "popup", "noinsert", "noselect", "fuzzy" }
 
 For now, no plugin configuration is possible.
 
+## Autocompletion
+
+Works with vim/nvim autocompletion. Example:
+
+```lua
+-- 'F' is the important part, it includes completefunc as a completion source
+vim.o.complete = "o,.,w,b,u,F"
+```
+
 ## Adding snippets
 
 Only vscode-like json snippets are supported, they must be placed in a `snippets/` folder at the root of your
