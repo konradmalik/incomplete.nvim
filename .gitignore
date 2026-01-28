@@ -4,3 +4,4 @@ result
 *.spl
 *.log
 .luarc.json
+.envrc
