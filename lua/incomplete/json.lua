@@ -35,15 +35,17 @@ end
 ---@param snips table<string, table>[]
 ---@return vim.v.completed_item[]
 local function convert(snips)
-    return vim.tbl_values(vim.tbl_map(function(value)
-        ---@type vim.v.completed_item
-        return {
-            word = get_prefix(value.prefix),
-            menu = "󰩫",
-            info = value.description,
-            user_data = { incomplete = value },
-        }
-    end, snips))
+    return vim.iter(snips)
+        :map(function(key, value)
+            ---@type vim.v.completed_item
+            return {
+                word = value.prefix and get_prefix(value.prefix) or key,
+                menu = "󰩫",
+                info = value.description,
+                user_data = { incomplete = value },
+            }
+        end)
+        :totable()
 end
 
 --- Builds a ft to snippet absolute paths lookup table

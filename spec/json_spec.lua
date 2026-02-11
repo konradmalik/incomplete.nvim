@@ -84,4 +84,37 @@ describe("json module", function()
             },
         }, actual_snippets)
     end)
+
+    it("reads snippets even when prefix is missing", function()
+        -- act
+        local actual_snippets = json.load_for("org")
+
+        -- assert
+        table.sort(actual_snippets, function(a, b) return a.info < b.info end)
+        assert.are.same({
+            {
+                ["info"] = "#+attr_html: :width ...",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["description"] = "#+attr_html: :width ...",
+                        ["body"] = { "#+ATTR_HTML: :width ${1:500px}" },
+                    },
+                },
+                ["word"] = "html width",
+            },
+            {
+                ["info"] = "TODO item",
+                ["menu"] = "󰩫",
+                ["user_data"] = {
+                    ["incomplete"] = {
+                        ["description"] = "TODO item",
+                        ["prefix"] = "todo",
+                        ["body"] = { "TODO ${1:task description}" },
+                    },
+                },
+                ["word"] = "todo",
+            },
+        }, actual_snippets)
+    end)
 end)

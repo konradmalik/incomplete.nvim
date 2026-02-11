@@ -1,0 +1,11 @@
+{
+    "todo": {
+        "description": "TODO item",
+        "prefix": "todo",
+        "body": ["TODO ${1:task description}"]
+    },
+    "html width": {
+        "description": "#+attr_html: :width ...",
+        "body": ["#+ATTR_HTML: :width ${1:500px}"]
+    }
+}

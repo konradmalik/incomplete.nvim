@@ -5,6 +5,10 @@
             {
                 "language": "all",
                 "path": "./all.json"
+            },
+            {
+                "language": "org",
+                "path": "./org.json"
             }
         ]
     }
