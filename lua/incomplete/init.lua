@@ -62,7 +62,6 @@ do
     ---@param original_ft integer
     ---@param additional_fts string[]
     function M.extend_filetype(original_ft, additional_fts)
-        cached_snippets[original_ft] = nil
         ft_extensions[original_ft] = additional_fts
     end
 
