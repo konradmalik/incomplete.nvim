@@ -82,12 +82,13 @@ do
         local bufnr = vim.api.nvim_get_current_buf()
         local ft = vim.bo[bufnr].filetype
         inject_snippets_for(ft, gathered_snippets)
-        inject_snippets_for("all", gathered_snippets)
 
         local extensions = ft_extensions[ft] or {}
         for _, ext in ipairs(extensions) do
             inject_snippets_for(ext, gathered_snippets)
         end
+
+        inject_snippets_for("all", gathered_snippets)
 
         return {
             ---@type vim.v.completed_item[]
