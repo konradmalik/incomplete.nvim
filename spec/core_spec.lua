@@ -53,6 +53,17 @@ describe("in incomplete module", function()
         assert.are.same(5, #actual_snippets.words)
     end)
 
+    it("extend_filetype clears cache and adds snippets", function()
+        -- arrange
+        inc.extend_filetype(vim.bo[bufnr].filetype, { "org" })
+
+        -- act
+        local actual_snippets = inc.completefunc(0, "")
+
+        -- assert
+        assert.are.same(7, #actual_snippets.words)
+    end)
+
     it("_handle_autocmd works for 'accepted'", function()
         -- arrange
         local winid = get_window(bufnr)

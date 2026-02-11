@@ -54,6 +54,18 @@ do
         vim.list_extend(target, cached_snippets[what])
     end
 
+    ---@type table<string,string[]>
+    local ft_extensions = {}
+
+    ---Allows loading snippets from other filetypes in addition to the original one.
+    ---NOTE: multiple calls for the same original will keep overwriting the entry.
+    ---@param original_ft integer
+    ---@param additional_fts string[]
+    function M.extend_filetype(original_ft, additional_fts)
+        cached_snippets[original_ft] = nil
+        ft_extensions[original_ft] = additional_fts
+    end
+
     ---completefunc implementation that serves snippets
     ---@param findstart integer
     ---@param base string
@@ -66,12 +78,17 @@ do
             return -1
         end
 
+        local gathered_snippets = {}
+
         local bufnr = vim.api.nvim_get_current_buf()
         local ft = vim.bo[bufnr].filetype
-
-        local gathered_snippets = {}
         inject_snippets_for(ft, gathered_snippets)
         inject_snippets_for("all", gathered_snippets)
+
+        local extensions = ft_extensions[ft] or {}
+        for _, ext in ipairs(extensions) do
+            inject_snippets_for(ext, gathered_snippets)
+        end
 
         return {
             ---@type vim.v.completed_item[]

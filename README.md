@@ -24,7 +24,17 @@ vim.opt.shortmess:append("c")
 vim.opt.completeopt = { "menuone", "popup", "noinsert", "noselect", "fuzzy" }
 ```
 
-For now, no plugin configuration is possible.
+## Extending filetypes
+
+In order to load snippets from additional filetypes (e.g. frameworks) in the original filetype, use `extend_filetype` function.
+For example, the below will cause the following snippets to be loaded for the `php` filetype: `php`, `all`, `phpdoc`.
+
+> [!NOTE]
+> Calling this more than once for the same filetype will overwrite whatever was provided in the previous call.
+
+```lua
+require('incomplete').extend_filetype("php", {"phpdoc"})
+```
 
 ## Autocompletion
 
