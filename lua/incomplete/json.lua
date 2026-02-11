@@ -36,15 +36,20 @@ end
 ---@return vim.v.completed_item[]
 local function convert(snips)
     return vim.iter(snips)
-        :map(function(key, value)
-            ---@type vim.v.completed_item
-            return {
-                word = value.prefix and get_prefix(value.prefix) or key,
-                menu = "󰩫",
-                info = value.description,
-                user_data = { incomplete = value },
-            }
-        end)
+        :map(
+            ---@param key string
+            ---@param value table
+            ---@return vim.v.completed_item
+            function(key, value)
+                ---@type vim.v.completed_item
+                return {
+                    word = value.prefix and get_prefix(value.prefix) or key,
+                    menu = "󰩫",
+                    info = value.description,
+                    user_data = { incomplete = value },
+                }
+            end
+        )
         :totable()
 end
 
