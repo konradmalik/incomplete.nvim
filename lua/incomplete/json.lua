@@ -31,14 +31,19 @@ local function get_prefix(prefix)
     return longest_string(prefix) or prefix[1]
 end
 
+---@class JsonSnippet
+---@field prefix? string
+---@field description string
+---@field body string|string[]
+
 ---converts json snippets into incomplete
----@param snips table<string, table>[]
+---@param snips table<string, JsonSnippet>[]
 ---@return vim.v.completed_item[]
 local function convert(snips)
     return vim.iter(snips)
         :map(
             ---@param key string
-            ---@param value table
+            ---@param value JsonSnippet
             ---@return vim.v.completed_item
             function(key, value)
                 ---@type vim.v.completed_item
@@ -89,7 +94,7 @@ do
 
     ---Reads snippets from json files specified in package.json
     ---@param ft string filetype or "all" for non-filetype specific
-    ---@return table[]
+    ---@return vim.v.completed_item[]
     function M.load_for(ft)
         if not lookup then lookup = build_ft_snippet_lookup() end
 
