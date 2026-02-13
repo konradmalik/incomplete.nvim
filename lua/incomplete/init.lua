@@ -1,5 +1,5 @@
 ---@class CompleteDict
----@field words string|vim.v.completed_item
+---@field words string[]|vim.v.completed_item[]
 ---@field refresh? "always"|nil
 
 ---@param what string
@@ -66,17 +66,18 @@ do
     end
 
     ---completefunc implementation that serves snippets
-    ---@param findstart integer
-    ---@param base string
-    ---@return integer|{words: vim.v.completed_item[]}
-    function M.completefunc(findstart, base)
-        if findstart == 1 and base == "" then
+    ---@param findstart integer 1 on first call, 0 on further calls
+    ---@param base string ignore when findstart == 1, use as filter later
+    ---@return integer|CompleteDict column to start completion when findstart == 1, return completions otherwise
+    function M.completefunc(findstart, base) -- luacheck: no unused args
+        if findstart == 1 then
             -- column where completion starts
             -- eg. return 0 for start of the line
             -- return -1 for cursor column
             return -1
         end
 
+        ---@type vim.v.completed_item[]
         local gathered_snippets = {}
 
         local bufnr = vim.api.nvim_get_current_buf()
@@ -90,8 +91,8 @@ do
 
         inject_snippets_for("all", gathered_snippets)
 
+        ---@type CompleteDict
         return {
-            ---@type vim.v.completed_item[]
             words = gathered_snippets,
         }
     end

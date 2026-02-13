@@ -23,6 +23,14 @@ describe("in incomplete module", function()
         vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
+    it("compfunc returns proper start", function()
+        -- act
+        local actual_column = inc.completefunc(1, "")
+
+        -- assert
+        assert.are.same(-1, actual_column)
+    end)
+
     it("compfunc returns proper items for unknown type", function()
         -- arrange
         vim.bo[bufnr].filetype = "something"
