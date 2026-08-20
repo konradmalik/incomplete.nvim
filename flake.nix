@@ -16,14 +16,7 @@
       ...
     }:
     let
-      nixpkgsFor =
-        system:
-        (import nixpkgs {
-          inherit system;
-          overlays = [
-            gen-luarc.overlays.default
-          ];
-        });
+      nixpkgsFor = system: nixpkgs.legacyPackages.${system}.extend gen-luarc.overlays.default;
 
       forAllSystems =
         function:
