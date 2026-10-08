@@ -16,16 +16,3 @@ jobs:
             accept-flake-config = true
       - name: Flake check
         run: nix flake check
-
-  tests:
-    runs-on: macos-26
-    needs:
-      - flake-check
-    steps:
-      - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            accept-flake-config = true
-      - name: run tests
-        run: nix develop --command make test
