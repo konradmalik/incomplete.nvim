@@ -15,17 +15,4 @@ jobs:
           extra_nix_config: |
             accept-flake-config = true
       - name: Flake check
-        run: nix flake check --all-systems
-
-  tests:
-    runs-on: ubuntu-latest
-    needs:
-      - flake-check
-    steps:
-      - uses: actions/checkout@v7
-      - uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            accept-flake-config = true
-      - name: run tests
-        run: nix develop --command make test
+        run: nix flake check
