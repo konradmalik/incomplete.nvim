@@ -12,6 +12,8 @@
         "*.yaml"
         "*.yml"
       ];
+      # intentionally invalid fixture
+      excludes = [ "test/edge/malformed.json" ];
     };
     shfmt = {
       enable = true;

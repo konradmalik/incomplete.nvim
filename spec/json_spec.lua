@@ -118,3 +118,47 @@ describe("json module", function()
         }, actual_snippets)
     end)
 end)
+
+describe("json module edge cases", function()
+    local json_edge
+    local notifications
+    local notify = vim.notify
+
+    setup(function()
+        vim.o.rtp = "./test/edge," .. original_rtp
+        -- fresh module so that the lookup is built with this rtp
+        package.loaded["incomplete.json"] = nil
+        json_edge = require("incomplete.json")
+    end)
+    teardown(function()
+        vim.o.rtp = original_rtp
+        package.loaded["incomplete.json"] = nil
+    end)
+    before_each(function()
+        notifications = {}
+        vim.notify = function(msg) table.insert(notifications, msg) end
+    end)
+    after_each(function() vim.notify = notify end)
+
+    it("keeps snippets with the same name from different files", function()
+        -- act
+        local actual_snippets = json_edge.load_for("dup")
+
+        -- assert
+        table.sort(actual_snippets, function(a, b) return (a.info or "") < (b.info or "") end)
+        assert.are.same({ "second", { "first", "log" } }, {
+            actual_snippets[1].user_data.incomplete.body,
+            actual_snippets[2].user_data.incomplete.body,
+        })
+        assert.is_nil(actual_snippets[1].info)
+    end)
+
+    it("skips missing and malformed files", function()
+        -- act
+        local actual_snippets = json_edge.load_for("broken")
+
+        -- assert
+        assert.are.same({ "ok" }, vim.tbl_map(function(i) return i.word end, actual_snippets))
+        assert.are.same(2, #notifications)
+    end)
+end)
