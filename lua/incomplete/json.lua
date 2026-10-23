@@ -77,7 +77,7 @@ local function load_file(file)
                         word = prefix,
                         menu = menu,
                         info = info,
-                        user_data = { incomplete = snippet },
+                        user_data = { incomplete = body },
                     }
                     table.insert(items, item)
                 end

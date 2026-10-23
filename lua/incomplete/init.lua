@@ -78,7 +78,7 @@ end
 
 ---Replaces the just inserted word with the expanded snippet
 ---@param word string
----@param body string|string[]
+---@param body string
 local function expand(word, body)
     local row, col = unpack(vim.api.nvim_win_get_cursor(0))
     local inserted = vim.api.nvim_get_current_line():sub(col - #word + 1, col)
@@ -91,15 +91,16 @@ local function expand(word, body)
         return
     end
     vim.api.nvim_buf_set_text(0, row - 1, col - #word, row - 1, col, {})
-    if type(body) == "table" then body = table.concat(body, "\n") end
     vim.snippet.expand(body)
 end
 
 ---@param completed_item vim.v.completed_item
 ---@param event_reason string
 function M._handle_autocmd(completed_item, event_reason)
-    local body = vim.tbl_get(completed_item, "user_data", "incomplete", "body")
-    if event_reason == "accept" and body then expand(completed_item.word, body) end
+    local body = vim.tbl_get(completed_item, "user_data", "incomplete")
+    if event_reason == "accept" and type(body) == "string" then
+        expand(completed_item.word, body)
+    end
 end
 
 ---Clears all cached snippets, they will be loaded again from the runtimepath when needed.

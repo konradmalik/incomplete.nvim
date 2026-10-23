@@ -203,11 +203,8 @@ describe("in incomplete module", function()
     it("_handle_autocmd works for multi-line bodies", function()
         -- arrange
         local winid = get_window(bufnr)
-        local completed_item = utils.simulate_complete_done(
-            winid,
-            bufnr,
-            { "body line 1", "body line 2", "body line 3" }
-        )
+        local completed_item =
+            utils.simulate_complete_done(winid, bufnr, "body line 1\nbody line 2\nbody line 3")
 
         -- act
         inc._handle_autocmd(completed_item, "accept")

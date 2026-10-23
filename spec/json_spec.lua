@@ -16,11 +16,7 @@ describe("json module", function()
                 ["info"] = "when you have enough\n\n(╯°□°)╯彡┻━┻",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
-                    ["incomplete"] = {
-                        ["body"] = "(╯°□°)╯彡┻━┻",
-                        ["prefix"] = "rageflip",
-                        ["description"] = "when you have enough",
-                    },
+                    ["incomplete"] = "(╯°□°)╯彡┻━┻",
                 },
                 ["word"] = "rageflip",
             },
@@ -28,11 +24,7 @@ describe("json module", function()
                 ["info"] = "when you have nothing better to say\n\n¯\\_(ツ)_/¯",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
-                    ["incomplete"] = {
-                        ["body"] = "¯\\_(ツ)_/¯",
-                        ["prefix"] = "shrug",
-                        ["description"] = "when you have nothing better to say",
-                    },
+                    ["incomplete"] = "¯\\_(ツ)_/¯",
                 },
                 ["word"] = "shrug",
             },
@@ -40,11 +32,7 @@ describe("json module", function()
                 ["info"] = "iksde\n\nxD",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
-                    ["incomplete"] = {
-                        ["body"] = "xD",
-                        ["prefix"] = "xd",
-                        ["description"] = "iksde",
-                    },
+                    ["incomplete"] = "xD",
                 },
                 ["word"] = "xd",
             },
@@ -70,23 +58,28 @@ describe("json module", function()
         local single_info = single.description .. "\n\n" .. single.body
         local doubled_info = doubled.description .. "\n\n" .. doubled.body
         assert.are.same({
-            { info = single_info, menu = "󰩫", user_data = { incomplete = single }, word = "go" },
             {
                 info = single_info,
                 menu = "󰩫",
-                user_data = { incomplete = single },
+                user_data = { incomplete = single.body },
+                word = "go",
+            },
+            {
+                info = single_info,
+                menu = "󰩫",
+                user_data = { incomplete = single.body },
                 word = "gopher",
             },
             {
                 info = doubled_info,
                 menu = "󰩫",
-                user_data = { incomplete = doubled },
+                user_data = { incomplete = doubled.body },
                 word = "go",
             },
             {
                 info = doubled_info,
                 menu = "󰩫",
-                user_data = { incomplete = doubled },
+                user_data = { incomplete = doubled.body },
                 word = "gopher",
             },
         }, actual_snippets)
@@ -103,10 +96,7 @@ describe("json module", function()
                 ["info"] = "#+attr_html: :width ...\n\n#+ATTR_HTML: :width ${1:500px}",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
-                    ["incomplete"] = {
-                        ["description"] = "#+attr_html: :width ...",
-                        ["body"] = { "#+ATTR_HTML: :width ${1:500px}" },
-                    },
+                    ["incomplete"] = "#+ATTR_HTML: :width ${1:500px}",
                 },
                 ["word"] = "html width",
             },
@@ -114,11 +104,7 @@ describe("json module", function()
                 ["info"] = "TODO item\n\nTODO ${1:task description}",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
-                    ["incomplete"] = {
-                        ["description"] = "TODO item",
-                        ["prefix"] = "todo",
-                        ["body"] = { "TODO ${1:task description}" },
-                    },
+                    ["incomplete"] = "TODO ${1:task description}",
                 },
                 ["word"] = "todo",
             },
@@ -185,9 +171,9 @@ describe("json module edge cases", function()
 
         -- assert
         table.sort(actual_snippets, function(a, b) return a.info < b.info end)
-        assert.are.same({ { "first", "log" }, "second" }, {
-            actual_snippets[1].user_data.incomplete.body,
-            actual_snippets[2].user_data.incomplete.body,
+        assert.are.same({ "first\nlog", "second" }, {
+            actual_snippets[1].user_data.incomplete,
+            actual_snippets[2].user_data.incomplete,
         })
         -- no description is inherited from the other snippet
         assert.are.same("second", actual_snippets[2].info)
