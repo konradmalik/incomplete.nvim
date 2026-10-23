@@ -24,6 +24,17 @@ vim.opt.shortmess:append("c")
 vim.opt.completeopt = { "menuone", "popup", "noinsert", "noselect", "fuzzy" }
 ```
 
+## Configuration
+
+Optional, set before snippets are first loaded:
+
+```lua
+vim.g.incomplete = {
+    -- text shown in the completion menu next to each snippet, default is a Nerd Font icon
+    menu = "[S]",
+}
+```
+
 ## Extending filetypes
 
 In order to load snippets from additional filetypes (e.g. frameworks) in the original filetype, use `extend_filetype` function.
@@ -54,6 +65,11 @@ Only vscode-like json snippets are supported, they must be placed in a `snippets
 runtimepath (e.g. at `$XDG_CONFIG_HOME/nvim/snippets`) with a `package.json` that contains metadata about all snippets.
 
 Snippets for ft named `all` will be always loaded. Snippets for other fts will be loaded lazily only for that filetype.
+
+Snippets with multiple prefixes show up once per prefix. Comments in snippet json files are supported on Neovim 0.12+.
+
+Snippets are cached after the first use. Run `:IncompleteReload` (or `require('incomplete').reload()`) after
+adding/editing snippet files or lazy-loading a plugin that provides snippets.
 
 See [Chris Grieser's nvim-scissors](https://github.com/chrisgrieser/nvim-scissors?tab=readme-ov-file#cookbook--faq) for a quick guide.
 

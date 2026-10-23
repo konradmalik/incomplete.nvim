@@ -13,7 +13,7 @@ describe("json module", function()
         table.sort(actual_snippets, function(a, b) return a.word < b.word end)
         assert.are.same({
             {
-                ["info"] = "when you have enough",
+                ["info"] = "when you have enough\n\n(╯°□°)╯彡┻━┻",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
                     ["incomplete"] = {
@@ -25,7 +25,7 @@ describe("json module", function()
                 ["word"] = "rageflip",
             },
             {
-                ["info"] = "when you have nothing better to say",
+                ["info"] = "when you have nothing better to say\n\n¯\\_(ツ)_/¯",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
                     ["incomplete"] = {
@@ -37,7 +37,7 @@ describe("json module", function()
                 ["word"] = "shrug",
             },
             {
-                ["info"] = "iksde",
+                ["info"] = "iksde\n\nxD",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
                     ["incomplete"] = {
@@ -51,36 +51,43 @@ describe("json module", function()
         }, actual_snippets)
     end)
 
-    it("reads snippets for an ft when two are specified", function()
+    it("reads snippets for an ft when two are specified, one item per prefix", function()
         -- act
         local actual_snippets = json.load_for("go")
 
         -- assert
-        table.sort(actual_snippets, function(a, b) return a.info < b.info end)
+        table.sort(actual_snippets, function(a, b) return a.info .. a.word < b.info .. b.word end)
+        local single = {
+            ["body"] = "(|-.-|)",
+            ["prefix"] = { "go", "gopher" },
+            ["description"] = "ChatGPT's suggested single line gopher ascii art...",
+        }
+        local doubled = {
+            ["body"] = "(|-.-|)(|-.-|)",
+            ["prefix"] = { "go", "gopher" },
+            ["description"] = "ChatGPT's suggested single line gopher ascii art... but doubled",
+        }
+        local single_info = single.description .. "\n\n" .. single.body
+        local doubled_info = doubled.description .. "\n\n" .. doubled.body
         assert.are.same({
+            { info = single_info, menu = "󰩫", user_data = { incomplete = single }, word = "go" },
             {
-                ["info"] = "ChatGPT's suggested single line gopher ascii art...",
-                ["menu"] = "󰩫",
-                ["user_data"] = {
-                    ["incomplete"] = {
-                        ["body"] = "(|-.-|)",
-                        ["prefix"] = { "go", "gopher" },
-                        ["description"] = "ChatGPT's suggested single line gopher ascii art...",
-                    },
-                },
-                ["word"] = "gopher",
+                info = single_info,
+                menu = "󰩫",
+                user_data = { incomplete = single },
+                word = "gopher",
             },
             {
-                ["info"] = "ChatGPT's suggested single line gopher ascii art... but doubled",
-                ["menu"] = "󰩫",
-                ["user_data"] = {
-                    ["incomplete"] = {
-                        ["body"] = "(|-.-|)(|-.-|)",
-                        ["prefix"] = { "go", "gopher" },
-                        ["description"] = "ChatGPT's suggested single line gopher ascii art... but doubled",
-                    },
-                },
-                ["word"] = "gopher",
+                info = doubled_info,
+                menu = "󰩫",
+                user_data = { incomplete = doubled },
+                word = "go",
+            },
+            {
+                info = doubled_info,
+                menu = "󰩫",
+                user_data = { incomplete = doubled },
+                word = "gopher",
             },
         }, actual_snippets)
     end)
@@ -93,7 +100,7 @@ describe("json module", function()
         table.sort(actual_snippets, function(a, b) return a.info < b.info end)
         assert.are.same({
             {
-                ["info"] = "#+attr_html: :width ...",
+                ["info"] = "#+attr_html: :width ...\n\n#+ATTR_HTML: :width ${1:500px}",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
                     ["incomplete"] = {
@@ -104,7 +111,7 @@ describe("json module", function()
                 ["word"] = "html width",
             },
             {
-                ["info"] = "TODO item",
+                ["info"] = "TODO item\n\nTODO ${1:task description}",
                 ["menu"] = "󰩫",
                 ["user_data"] = {
                     ["incomplete"] = {
@@ -116,6 +123,38 @@ describe("json module", function()
                 ["word"] = "todo",
             },
         }, actual_snippets)
+    end)
+
+    it("uses menu from vim.g.incomplete", function()
+        -- arrange
+        vim.g.incomplete = { menu = "[S]" }
+        finally(function() vim.g.incomplete = nil end)
+
+        -- act
+        local actual_snippets = json.load_for("all")
+
+        -- assert
+        assert.are.same(
+            { "[S]" },
+            vim.fn.uniq(vim.tbl_map(function(i) return i.menu end, actual_snippets))
+        )
+    end)
+
+    it("reset rebuilds the lookup from the current runtimepath", function()
+        -- arrange
+        json.load_for("all")
+        finally(function()
+            vim.o.rtp = "./test," .. original_rtp
+            json.reset()
+        end)
+        vim.o.rtp = original_rtp
+
+        -- act
+        json.reset()
+        local actual_snippets = json.load_for("all")
+
+        -- assert
+        assert.are.same({}, actual_snippets)
     end)
 end)
 
@@ -145,20 +184,37 @@ describe("json module edge cases", function()
         local actual_snippets = json_edge.load_for("dup")
 
         -- assert
-        table.sort(actual_snippets, function(a, b) return (a.info or "") < (b.info or "") end)
-        assert.are.same({ "second", { "first", "log" } }, {
+        table.sort(actual_snippets, function(a, b) return a.info < b.info end)
+        assert.are.same({ { "first", "log" }, "second" }, {
             actual_snippets[1].user_data.incomplete.body,
             actual_snippets[2].user_data.incomplete.body,
         })
-        assert.is_nil(actual_snippets[1].info)
+        -- no description is inherited from the other snippet
+        assert.are.same("second", actual_snippets[2].info)
     end)
 
-    it("skips missing and malformed files", function()
+    it("skips missing and malformed files and invalid snippets", function()
         -- act
         local actual_snippets = json_edge.load_for("broken")
 
         -- assert
-        assert.are.same({ "ok" }, vim.tbl_map(function(i) return i.word end, actual_snippets))
-        assert.are.same(2, #notifications)
+        local words = vim.tbl_map(function(i) return i.word end, actual_snippets)
+        table.sort(words)
+        assert.are.same({ "odd", "ok" }, words)
+        -- missing, malformed and badbody
+        assert.are.same(3, #notifications)
+    end)
+
+    it("reads json with comments", function()
+        if vim.fn.has("nvim-0.12") == 0 then return end
+
+        -- act
+        local actual_snippets = json_edge.load_for("jsonc")
+
+        -- assert
+        assert.are.same(
+            { "commented" },
+            vim.tbl_map(function(i) return i.word end, actual_snippets)
+        )
     end)
 end)

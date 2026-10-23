@@ -1,10 +1,13 @@
+-- vscode snippet files are often jsonc
+local json_opts = vim.fn.has("nvim-0.12") == 1 and { skip_comments = true } or nil
+
 ---Reads and decodes a single json file, notifies and returns nil on failure
 ---@param file string
 ---@return table?
 local function read_json(file)
     local ok, result = pcall(function()
         local lines = vim.fn.readfile(file)
-        return vim.json.decode(table.concat(lines, ""))
+        return vim.json.decode(table.concat(lines, "\n"), json_opts)
     end)
     if not ok then
         vim.notify(
@@ -20,52 +23,50 @@ local function read_json(file)
     return result
 end
 
----get longest string from a table
----@param list string[]
----@return string?
-local function longest_string(list)
-    local longest = list[1]
-    for _, v in ipairs(list) do
-        if #v > #longest then longest = v end
-    end
-    return longest
-end
-
----get prefix
----@param prefix string[]|string
----@return string
-local function get_prefix(prefix)
-    if type(prefix) == "string" then return prefix end
-
-    return longest_string(prefix) or prefix[1]
-end
-
 ---@class JsonSnippet
----@field prefix? string
----@field description string
+---@field prefix? string|string[]
+---@field description? string
 ---@field body string|string[]
 
----converts json snippets into incomplete
+---@param snippet JsonSnippet
+---@return string
+local function build_info(snippet)
+    local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
+    if type(snippet.description) ~= "string" or snippet.description == "" then return body end
+    return snippet.description .. "\n\n" .. body
+end
+
+---converts json snippets into incomplete.
+---Snippets with multiple prefixes produce one item per prefix, snippets without a body are skipped.
 ---@param snips table<string, JsonSnippet>
 ---@return vim.v.completed_item[]
 local function convert(snips)
-    return vim.iter(snips)
-        :filter(function(_, value) return type(value) == "table" end)
-        :map(
-            ---@param key string
-            ---@param value JsonSnippet
-            ---@return vim.v.completed_item
-            function(key, value)
-                ---@type vim.v.completed_item
-                return {
-                    word = value.prefix and get_prefix(value.prefix) or key,
-                    menu = "󰩫",
-                    info = value.description,
-                    user_data = { incomplete = value },
-                }
+    local menu = vim.tbl_get(vim.g, "incomplete", "menu") or "󰩫"
+    local items = {}
+    for key, value in pairs(snips) do
+        if
+            type(value) == "table" and (type(value.body) == "string" or type(value.body) == "table")
+        then
+            local prefixes = value.prefix
+            if type(prefixes) ~= "table" then prefixes = { prefixes } end
+            if #prefixes == 0 then prefixes = { key } end
+            local info = build_info(value)
+            for _, prefix in ipairs(prefixes) do
+                -- skips eg. numeric keys of json arrays
+                if type(prefix) == "string" and prefix ~= "" then
+                    ---@type vim.v.completed_item
+                    local item = {
+                        word = prefix,
+                        menu = menu,
+                        info = info,
+                        user_data = { incomplete = value },
+                    }
+                    table.insert(items, item)
+                end
             end
-        )
-        :totable()
+        end
+    end
+    return items
 end
 
 --- Builds a ft to snippet absolute paths lookup table
@@ -114,10 +115,21 @@ do
         local items = {}
         for _, file in ipairs(lookup[ft] or {}) do
             local snips = read_json(file)
-            if snips then vim.list_extend(items, convert(snips)) end
+            local ok, converted = pcall(convert, snips or {})
+            if ok then
+                vim.list_extend(items, converted)
+            else
+                vim.notify(
+                    "incomplete: cannot convert '" .. file .. "': " .. tostring(converted),
+                    vim.log.levels.WARN
+                )
+            end
         end
         return items
     end
+
+    ---Forgets the ft to snippet files lookup, it will be rebuilt from the runtimepath on next load.
+    function M.reset() lookup = nil end
 end
 
 return M

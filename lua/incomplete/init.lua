@@ -6,15 +6,11 @@
 ---@return vim.v.completed_item[]
 local function build_cache_for(what) return require("incomplete.json").load_for(what) end
 
----@param completed_item {word: string}
+---@param completed_item {word: string, user_data: table}
 local function handle_accepted_snippet(completed_item)
     local word = completed_item.word ---@type string
+    -- always present, snippets without a body are skipped when loading
     local body = vim.tbl_get(completed_item, "user_data", "incomplete", "body")
-    -- no cached snippet like that
-    if not body then
-        vim.notify("no snippet body for: '" .. word .. "'", vim.log.levels.ERROR)
-        return
-    end
 
     local cursor = vim.api.nvim_win_get_cursor(vim.api.nvim_get_current_win())
     local row, col = cursor[1] - 1, cursor[2]
@@ -83,6 +79,13 @@ do
 
     ---@type table<string,string[]>
     local ft_extensions = {}
+
+    ---Clears all cached snippets, they will be loaded again from the runtimepath when needed.
+    ---Useful after adding/editing snippet files or loading a plugin that provides snippets.
+    function M.reload()
+        cached_snippets = {}
+        require("incomplete.json").reset()
+    end
 
     ---Allows loading snippets from other filetypes in addition to the original one.
     ---NOTE: multiple calls for the same original will keep overwriting the entry.
