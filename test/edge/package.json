@@ -1,0 +1,30 @@
+{
+    "name": "test-snippets-edge-cases",
+    "contributes": {
+        "snippets": [
+            {
+                "language": "dup",
+                "path": "./dup1.json"
+            },
+            {
+                "language": "dup",
+                "path": "./dup2.json"
+            },
+            {
+                "language": "broken",
+                "path": "./missing.json"
+            },
+            {
+                "language": "broken",
+                "path": "./malformed.json"
+            },
+            {
+                "path": "./no-language.json"
+            },
+            {
+                "language": "broken",
+                "path": "./ok.json"
+            }
+        ]
+    }
+}

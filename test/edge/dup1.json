@@ -1,0 +1,7 @@
+{
+    "log": {
+        "prefix": "log",
+        "description": "first log",
+        "body": ["first", "log"]
+    }
+}

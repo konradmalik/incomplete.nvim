@@ -11,9 +11,16 @@ function M.get_buf_lines(bufnr) return vim.api.nvim_buf_get_lines(bufnr, 0, -1, 
 function M.simulate_complete_done(winid, bufnr, body)
     local completed_item = { word = "word", user_data = { incomplete = { body = body } } }
     -- fake as if we used completion menu (word would be inserted)
-    vim.api.nvim_buf_set_lines(bufnr, 0, 1, true, { completed_item.word .. " " })
+    vim.api.nvim_buf_set_lines(bufnr, 0, 1, true, { completed_item.word })
     vim.api.nvim_win_set_cursor(winid, { 1, #completed_item.word })
     return completed_item
+end
+
+---@param bufnr integer
+---@param text string
+function M.set_line_before_cursor(bufnr, text)
+    vim.api.nvim_buf_set_lines(bufnr, 0, 1, true, { text })
+    vim.api.nvim_win_set_cursor(0, { 1, #text })
 end
 
 return M

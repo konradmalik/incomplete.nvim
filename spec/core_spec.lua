@@ -1,6 +1,7 @@
 local inc = require("incomplete")
 local utils = require("test.utils")
 local original_rtp = vim.o.rtp
+local original_ve = vim.o.virtualedit
 
 ---@return integer
 local function get_window(bufnr)
@@ -13,6 +14,8 @@ describe("in incomplete module", function()
     local bufnr
     before_each(function()
         vim.o.rtp = "./test," .. vim.o.rtp
+        -- allow the cursor after the last char, like in insert mode
+        vim.o.virtualedit = "onemore"
 
         bufnr = vim.api.nvim_create_buf(true, false)
         vim.bo[bufnr].filetype = "go"
@@ -20,6 +23,7 @@ describe("in incomplete module", function()
     end)
     after_each(function()
         vim.o.rtp = original_rtp
+        vim.o.virtualedit = original_ve
         vim.api.nvim_buf_delete(bufnr, { force = true })
     end)
 
@@ -28,7 +32,67 @@ describe("in incomplete module", function()
         local actual_column = inc.completefunc(1, "")
 
         -- assert
-        assert.are.same(-1, actual_column)
+        assert.are.same(0, actual_column)
+    end)
+
+    it("compfunc start includes typed prefix", function()
+        -- arrange
+        utils.set_line_before_cursor(bufnr, "  foo shr")
+
+        -- act
+        local actual_column = inc.completefunc(1, "")
+
+        -- assert
+        assert.are.same(6, actual_column)
+    end)
+
+    it("compfunc start falls back to keyword when no snippet matches non-blank text", function()
+        -- arrange
+        utils.set_line_before_cursor(bufnr, "foo(shr")
+
+        -- act
+        local actual_column = inc.completefunc(1, "")
+
+        -- assert
+        assert.are.same(4, actual_column)
+    end)
+
+    it("compfunc filters by base", function()
+        -- act
+        local actual_snippets = inc.completefunc(0, "shr")
+
+        -- assert
+        assert.are.same(
+            { "shrug" },
+            vim.tbl_map(function(i) return i.word end, actual_snippets.words)
+        )
+    end)
+
+    it("compfunc filters by base fuzzily when completeopt has fuzzy", function()
+        -- arrange
+        local original_cot = vim.o.completeopt
+        finally(function() vim.o.completeopt = original_cot end)
+        vim.o.completeopt = "menuone,fuzzy"
+
+        -- act
+        local actual_snippets = inc.completefunc(0, "shg")
+
+        -- assert
+        assert.are.same(
+            { "shrug" },
+            vim.tbl_map(function(i) return i.word end, actual_snippets.words)
+        )
+    end)
+
+    it("compfunc supports compound filetypes", function()
+        -- arrange
+        vim.bo[bufnr].filetype = "go.org"
+
+        -- act
+        local actual_snippets = inc.completefunc(0, "")
+
+        -- assert
+        assert.are.same(7, #actual_snippets.words)
     end)
 
     it("compfunc returns proper items for unknown type", function()
@@ -72,6 +136,17 @@ describe("in incomplete module", function()
         assert.are.same(7, #actual_snippets.words)
     end)
 
+    it("extend_filetype does not duplicate snippets", function()
+        -- arrange
+        inc.extend_filetype(vim.bo[bufnr].filetype, { "go", "all" })
+
+        -- act
+        local actual_snippets = inc.completefunc(0, "")
+
+        -- assert
+        assert.are.same(5, #actual_snippets.words)
+    end)
+
     it("extend_filetype calls are not stateful", function()
         -- arrange
         inc.extend_filetype(vim.bo[bufnr].filetype, {})
@@ -92,7 +167,7 @@ describe("in incomplete module", function()
         inc._handle_autocmd(completed_item, "accept")
 
         -- assert
-        local expected_lines = { "body " }
+        local expected_lines = { "body" }
         local actual_lines = utils.get_buf_lines(bufnr)
         assert.are.same(expected_lines, actual_lines)
     end)
@@ -106,7 +181,7 @@ describe("in incomplete module", function()
         inc._handle_autocmd(completed_item, "other")
 
         -- assert
-        local expected_lines = { "word " }
+        local expected_lines = { "word" }
         local actual_lines = utils.get_buf_lines(bufnr)
         assert.are.same(expected_lines, actual_lines)
     end)
@@ -124,11 +199,25 @@ describe("in incomplete module", function()
         inc._handle_autocmd(completed_item, "accept")
 
         -- assert
-        -- totally no idea why there are spaces in line 2 and 3...
-        -- but this is the result of vim.snippet.expand.
-        -- Can it be because of insert mode problems in nlua?
-        local expected_lines = { "body line 1", " body line 2", " body line 3 " }
+        local expected_lines = { "body line 1", "body line 2", "body line 3" }
         local actual_lines = utils.get_buf_lines(bufnr)
         assert.are.same(expected_lines, actual_lines)
+    end)
+
+    it("_handle_autocmd does not delete text that is not the inserted word", function()
+        -- arrange
+        local winid = get_window(bufnr)
+        local completed_item = utils.simulate_complete_done(winid, bufnr, "body")
+        vim.api.nvim_buf_set_lines(bufnr, 0, 1, true, { "wo" })
+        vim.api.nvim_win_set_cursor(winid, { 1, 2 })
+        local notify = vim.notify
+        finally(function() vim.notify = notify end)
+        vim.notify = function() end
+
+        -- act
+        inc._handle_autocmd(completed_item, "accept")
+
+        -- assert
+        assert.are.same({ "wo" }, utils.get_buf_lines(bufnr))
     end)
 end)
