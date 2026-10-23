@@ -92,7 +92,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(7, #actual_snippets.words)
+        assert.are.same(9, #actual_snippets.words)
     end)
 
     it("compfunc returns proper items for unknown type", function()
@@ -111,7 +111,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(5, #actual_snippets.words)
+        assert.are.same(7, #actual_snippets.words)
     end)
 
     it("compfunc has caching", function()
@@ -122,7 +122,21 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(5, #actual_snippets.words)
+        assert.are.same(7, #actual_snippets.words)
+    end)
+
+    it("reload clears the cache", function()
+        -- arrange
+        inc.completefunc(0, "")
+        vim.o.rtp = original_rtp
+
+        -- act
+        inc.reload()
+        local actual_snippets = inc.completefunc(0, "")
+
+        -- assert
+        assert.are.same(0, #actual_snippets.words)
+        inc.reload()
     end)
 
     it("extend_filetype adds snippets", function()
@@ -133,7 +147,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(7, #actual_snippets.words)
+        assert.are.same(9, #actual_snippets.words)
     end)
 
     it("extend_filetype does not duplicate snippets", function()
@@ -144,7 +158,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(5, #actual_snippets.words)
+        assert.are.same(7, #actual_snippets.words)
     end)
 
     it("extend_filetype calls are not stateful", function()
@@ -155,7 +169,7 @@ describe("in incomplete module", function()
         local actual_snippets = inc.completefunc(0, "")
 
         -- assert
-        assert.are.same(5, #actual_snippets.words)
+        assert.are.same(7, #actual_snippets.words)
     end)
 
     it("_handle_autocmd works for 'accepted'", function()

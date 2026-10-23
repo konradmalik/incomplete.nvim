@@ -24,6 +24,18 @@
             {
                 "language": "broken",
                 "path": "./ok.json"
+            },
+            {
+                "language": "jsonc",
+                "path": "./comments.json"
+            },
+            {
+                "language": "broken",
+                "path": "./array.json"
+            },
+            {
+                "language": "broken",
+                "path": "./badbody.json"
             }
         ]
     }

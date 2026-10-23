@@ -2,5 +2,17 @@
     "ok": {
         "prefix": "ok",
         "body": "ok"
+    },
+    "no body": {
+        "prefix": "nobody"
+    },
+    "null body": {
+        "prefix": "nullbody",
+        "body": null
+    },
+    "odd fields": {
+        "prefix": ["", 5, "odd"],
+        "description": ["not", "a", "string"],
+        "body": "odd"
     }
 }

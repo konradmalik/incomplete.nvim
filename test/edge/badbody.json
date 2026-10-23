@@ -1,0 +1,6 @@
+{
+    "bad": {
+        "prefix": "bad",
+        "body": [["nested"]]
+    }
+}

@@ -1,0 +1,7 @@
+{
+    // a comment
+    "commented": {
+        "prefix": "commented",
+        "body": "works"
+    }
+}
