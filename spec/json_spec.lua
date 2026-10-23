@@ -192,8 +192,6 @@ describe("json module edge cases", function()
     end)
 
     it("reads json with comments", function()
-        if vim.fn.has("nvim-0.12") == 0 then return end
-
         -- act
         local actual_snippets = json_edge.load_for("jsonc")
 
