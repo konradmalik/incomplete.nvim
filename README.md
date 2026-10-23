@@ -4,6 +4,8 @@
 
 This small plugin for Neovim allows using `vim.opt.completefunc` to serve, expand and browse snippets.
 
+Only the latest Neovim (nightly) is supported.
+
 ## Usage
 
 Just set your complete function to the one exposed in this plugin:
@@ -66,7 +68,7 @@ runtimepath (e.g. at `$XDG_CONFIG_HOME/nvim/snippets`) with a `package.json` tha
 
 Snippets for ft named `all` will be always loaded. Snippets for other fts will be loaded lazily only for that filetype.
 
-Snippets with multiple prefixes show up once per prefix. Comments in snippet json files are supported on Neovim 0.12+.
+Snippets with multiple prefixes show up once per prefix. Comments in snippet json files are supported.
 
 Snippets are cached after the first use. Run `:IncompleteReload` (or `require('incomplete').reload()`) after
 adding/editing snippet files or lazy-loading a plugin that provides snippets.

@@ -1,10 +1,8 @@
--- vscode snippet files are often jsonc
-local decode_opts = vim.fn.has("nvim-0.12") == 1 and { skip_comments = true } or nil
-
 ---@param file string
 ---@return table
 local function read_json(file)
-    local decoded = vim.json.decode(vim.fn.readblob(file), decode_opts)
+    -- vscode snippet files are often jsonc
+    local decoded = vim.json.decode(vim.fn.readblob(file), { skip_comments = true })
     assert(type(decoded) == "table", "expected a json object")
     return decoded
 end
